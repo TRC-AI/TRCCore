@@ -64,6 +64,8 @@ public class SettingsManager {
 
     private static final String CLIENT_SUFFIX = "_client";
 
+    public static Gson gson() {return GSON;}
+
     public enum Side {
         COMMON,
         CLIENT;
