@@ -1,12 +1,18 @@
 package trc.core.settings;
 
+import net.minecraft.network.chat.Component;
+
 public class BoolSetting extends Setting {
     public boolean value;
 
     public boolean defaultValue;
 
-    public BoolSetting(String id, String name, boolean initialValue) {
-        super(id, name);
+    public BoolSetting(String id, Component translationComponent, boolean initialValue) {
+        this(id, translationComponent, initialValue, null);
+    }
+
+    public BoolSetting(String id, Component translationComponent, boolean initialValue, String name) {
+        super(id, translationComponent, name);
         this.value = initialValue;
         this.defaultValue = initialValue;
     }

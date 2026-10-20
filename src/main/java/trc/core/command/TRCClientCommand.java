@@ -19,8 +19,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket;
 
 import trc.core.Texts;
@@ -33,6 +31,7 @@ import trc.core.settings.SettingsManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,7 @@ import org.jspecify.annotations.Nullable;
 public final class TRCClientCommand {
     private static final String CLIENT_SUFFIX = "_client";
 
-    private static final SuggestionProvider<FabricClientCommandSource> MODS = (context, builder) ->
+    private static final SuggestionProvider<FabricClientCommandSource> MODS = (_, builder) ->
             SharedSuggestionProvider.suggest(clientMods(), builder);
 
     private static final SuggestionProvider<FabricClientCommandSource> SETTINGS = (context, builder) ->
@@ -59,7 +58,7 @@ public final class TRCClientCommand {
     };
 
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> build(dispatcher));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> build(dispatcher));
     }
 
     private static void build(@NotNull CommandDispatcher<FabricClientCommandSource> dispatcher) {
@@ -108,7 +107,7 @@ public final class TRCClientCommand {
             ArgumentBuilder<FabricClientCommandSource, ?> builder = child.createBuilder();
             builder.requires(ignored -> true);
 
-            if (builder.getCommand() != null) builder.executes(context -> 0);
+            if (builder.getCommand() != null) builder.executes(_ -> 0);
 
             CommandNode<FabricClientCommandSource> copy = builder.build();
 
@@ -176,7 +175,7 @@ public final class TRCClientCommand {
 
             for (String modId : mods) {
                 source.sendFeedback(SettingsCommand.listEntry(modId, SettingsCommand.displayNameOf(modId),
-                        clientHolder(modId).getSettings().size()));
+                        Objects.requireNonNull(clientHolder(modId)).getSettings().size()));
             }
         }
 

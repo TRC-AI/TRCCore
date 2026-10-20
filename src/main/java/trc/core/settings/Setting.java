@@ -4,6 +4,9 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.network.chat.Component;
 
 public abstract class Setting {
     private static final Pattern VALID_ID = Pattern.compile("[a-z0-9_-]+");
@@ -12,9 +15,17 @@ public abstract class Setting {
 
     public String id;
 
-    public Setting(String id, String name) {
+    @Nullable
+    public Component translationComponent;
+
+    public Setting(String id, Component translationComponent) {
+        this(id, translationComponent, null);
+    }
+
+    public Setting(String id, @Nullable Component translationComponent, String name) {
         this.name = name;
         this.id = validateId(id, name);
+        this.translationComponent = translationComponent;
     }
 
     public abstract void reset();

@@ -27,12 +27,12 @@ public class TRCCore implements ModInitializer {
 
         AddonLoader.run("trc_addon", TRCLog.CORE, SettingsManager.Side.COMMON);
 
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
+        ServerTickEvents.END_SERVER_TICK.register(_ -> {
             SettingsManager.getSettingsManager().tick(SettingsManager.Side.COMMON);
             SettingsAccessList.flush();
         });
 
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+        ServerLifecycleEvents.SERVER_STOPPING.register(_ -> {
             SettingsManager.getSettingsManager().flush(SettingsManager.Side.COMMON);
             SettingsAccessList.flush();
         });

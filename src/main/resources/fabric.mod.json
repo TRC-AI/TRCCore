@@ -8,7 +8,7 @@
 		"TRC-AI"
 	],
 	"contact": {
-		"sources": "https://github.com/TRC-AI/"
+		"sources": "https://github.com/TRC-AI/TRCCore"
 	},
 	"license": "MIT",
 	"icon": "assets/trc-core/icon.png",

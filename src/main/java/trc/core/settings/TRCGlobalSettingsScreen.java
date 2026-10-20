@@ -1,21 +1,11 @@
 package trc.core.settings;
 
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.mojang.blaze3d.platform.InputConstants;
-
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.components.AbstractScrollArea;
-import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ScrollableLayout;
-import net.minecraft.client.gui.components.SpriteIconButton;
-import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
@@ -25,8 +15,12 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
-
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import trc.core.TRCCore;
 import trc.core.TRCCoreClient;
 import trc.core.TRCCoreClientSettings;
@@ -34,20 +28,10 @@ import trc.core.TRCCoreSettings;
 import trc.core.net.ClientSettingsCache;
 import trc.core.net.SettingsSnapshot;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCache.Listener {
 
@@ -112,7 +96,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         this.titleWidget = this.addRenderableWidget(new StringWidget(this.screenTitle(), this.font));
 
         this.searchButton = this.addRenderableWidget(
-                SpriteIconButton.builder(Component.translatable("menu.trc-core.search"), button -> this.toggleSearch(), true)
+                SpriteIconButton.builder(Component.translatable("menu.trc-core.search"), _ -> this.toggleSearch(), true)
                         .size(SEARCH_BUTTON_SIZE, SEARCH_BUTTON_SIZE)
                         .sprite(SEARCH_SPRITE, 15, 15)
                         .build());
@@ -121,7 +105,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
 
         for (SideFilter filter : SideFilter.values()) {
             SpriteIconButton button = this.addRenderableWidget(
-                    SpriteIconButton.builder(filter.tooltip, pressed -> this.cycleSideFilter(), true)
+                    SpriteIconButton.builder(filter.tooltip, _ -> this.cycleSideFilter(), true)
                             .size(SEARCH_BUTTON_SIZE, SEARCH_BUTTON_SIZE)
                             .sprite(filter.sprite, FILTER_ICON_SIZE, FILTER_ICON_SIZE)
                             .build());
@@ -148,6 +132,17 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         super.removed();
     }
 
+    private static MutableComponent label(Setting s) {
+        boolean named = s.name != null && !s.name.isBlank();
+        if (s.translationComponent == null || named && !isTranslated(s.translationComponent)) {
+            return Component.literal(named ? s.name : s.id);
+        }
+        return s.translationComponent.copy();
+    }
+
+    private static boolean isTranslated(Component c) {
+        return !(c.getContents() instanceof TranslatableContents t) || Language.getInstance().has(t.getKey());
+    }
     private @NotNull Component screenTitle() {
         Component base = Component.translatable("menu.trc-core.settings");
 
@@ -262,7 +257,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         body.defaultCellSetting().alignHorizontallyCenter();
 
         if (this.searchOpen && this.searchBox != null) {
-            body.addChild(labelled((LayoutElement) this.searchBox, Component.translatable("menu.trc-core.search")));
+            body.addChild(labelled(this.searchBox, Component.translatable("menu.trc-core.search")));
             body.addChild(SpacerElement.height(SECTION_SPACING));
         }
 
@@ -353,7 +348,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
     private record SettingSink(Consumer<Setting> preview, Consumer<Setting> commit, Predicate<Setting> resettable) {
 
         static @NotNull SettingSink local(@NotNull ISettingsHolder holder) {
-            return new SettingSink(setting -> holder.onSettingsChanged(), setting -> commitLocal(holder),
+            return new SettingSink(_ -> holder.onSettingsChanged(), _ -> commitLocal(holder),
                     setting -> !setting.isDefault());
         }
 
@@ -440,7 +435,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
                 continue;
             }
 
-            sections.computeIfAbsent(sortKey(raw), key -> new ArrayList<>())
+            sections.computeIfAbsent(sortKey(raw), _ -> new ArrayList<>())
                     .add(new Section(sectionTitle(raw.displayName(), raw.client()), visible, raw.sink(),
                             raw.client() ? null : raw.modId()));
         }
@@ -518,7 +513,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         List<Setting> matches = new ArrayList<>();
 
         for (Setting setting : raw.settings()) {
-            if (contains(setting.name, needle) || contains(valueText(setting), needle)) {
+            if (contains(label(setting).getString(), needle) || contains(valueText(setting), needle)) {
                 matches.add(setting);
             }
         }
@@ -543,12 +538,11 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
     }
 
     private static int maxInputLength(@NotNull IntSetting setting) {
-        int digits = Math.max(
+
+        return Math.max(
                 String.valueOf(setting.minValue).length(),
                 String.valueOf(setting.maxValue).length()
         );
-
-        return Math.max(1, digits);
     }
 
     private static @NotNull Component sectionTitle(String displayName, boolean client) {
@@ -610,7 +604,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
             }
             else if (setting instanceof StringSetting stringSetting) {
                 SettingBox box = new SettingBox(this.font, MAIN_WIDTH, WIDGET_HEIGHT,
-                        Component.literal(stringSetting.name),
+                        label(stringSetting),
                         () -> sink.commit().accept(stringSetting), false);
 
                 Supplier<String> shown = () -> stringSetting.sensitive ? "" : stringSetting.value;
@@ -638,12 +632,12 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
 
                 body.addChild(labelled(
                         withReset(box, stringSetting, sink, () -> box.setValueQuietly(shown.get())),
-                        Component.literal(stringSetting.name)));
+                        label(stringSetting)));
             }
             else if (setting instanceof KeySetting keySetting) {
                 Button button = Button.builder(keyText(keySetting), pressed -> {
                     this.capture = new KeyCapture(pressed, keySetting, sink);
-                    pressed.setMessage(Component.literal(keySetting.name + ": ")
+                    pressed.setMessage(label(keySetting).append(": ")
                             .append(Component.translatable("menu.trc-core.key_waiting").withStyle(ChatFormatting.YELLOW)));
                 }).width(MAIN_WIDTH).build();
 
@@ -658,7 +652,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
             else if (setting instanceof IntSetting intSetting) {
                 if (intSetting.isInputField) {
                     SettingBox box = new SettingBox(this.font, MAIN_WIDTH, WIDGET_HEIGHT,
-                            Component.literal(intSetting.name),
+                            label(intSetting),
                             () -> sink.commit().accept(intSetting), true);
 
                     box.setMaxLength(maxInputLength(intSetting));
@@ -686,7 +680,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
                     LinearLayout row = withReset(box, intSetting, sink,
                             () -> box.setValueQuietly(String.valueOf(intSetting.value)));
 
-                    body.addChild(labelled(row, Component.literal(intSetting.name)));
+                    body.addChild(labelled(row, label(intSetting)));
                 } else {
                     IntSlider slider = new IntSlider(
                             0, 0, MAIN_WIDTH, WIDGET_HEIGHT, intSetting, section.serverModId(),
@@ -713,7 +707,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
                                             @NotNull SettingSink sink, @NotNull Runnable redrawMain) {
         SpriteIconButton reset = SpriteIconButton.builder(
                         Component.translatable("menu.trc-core.reset"),
-                        button -> {
+                        _ -> {
                             setting.reset();
                             redrawMain.run();
                             sink.commit().accept(setting);
@@ -759,7 +753,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
 
 
     @Override
-    public boolean keyPressed(final KeyEvent event) {
+    public boolean keyPressed(final @NonNull KeyEvent event) {
         if (this.capture != null) {
             finishCapture(event.isEscape() ? KeySetting.UNBOUND : InputConstants.getKey(event).getName());
             return true;
@@ -779,7 +773,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
     }
 
     @Override
-    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+    public boolean mouseClicked(final @NonNull MouseButtonEvent event, final boolean doubleClick) {
         if (this.capture != null) {
             finishCapture(InputConstants.Type.MOUSE.getOrCreate(event.button()).getName());
             return true;
@@ -836,12 +830,6 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         SettingsManager.getSettingsManager().markDirty(holder);
     }
 
-    private @NotNull Component keyText(@NotNull KeySetting setting) {
-        return Component.literal(setting.name + ": ")
-                .append(keyDisplay(setting).copy().withStyle(
-                        setting.isUnbound() ? ChatFormatting.GRAY : ChatFormatting.YELLOW));
-    }
-
     private static @NotNull Component keyDisplay(@NotNull KeySetting setting) {
         if (setting.isUnbound()) return Component.translatable("menu.trc-core.unbound");
 
@@ -872,15 +860,6 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
                 && setting.index < setting.values.size();
     }
 
-    @Contract(pure = true)
-    private @NotNull Component getBoolButtonText(@NotNull BoolSetting setting) {
-        Component state = setting.value
-                ? Component.translatable("menu.trc-core.on").withStyle(ChatFormatting.GREEN)
-                : Component.translatable("menu.trc-core.off").withStyle(ChatFormatting.RED);
-
-        return Component.literal(setting.name + ": ").append(state);
-    }
-
     private static @NotNull MutableComponent choiceValue(@NotNull ChoiceSetting setting) {
         String value = setting.values.get(setting.index);
 
@@ -890,12 +869,27 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
     }
 
     @Contract(pure = true)
+    private @NotNull Component getBoolButtonText(@NotNull BoolSetting setting) {
+        Component state = setting.value
+                ? Component.translatable("menu.trc-core.on").withStyle(ChatFormatting.GREEN)
+                : Component.translatable("menu.trc-core.off").withStyle(ChatFormatting.RED);
+
+        return label(setting).append(": ").append(state);
+    }
+
+    @Contract(pure = true)
     private @NotNull Component getChoiceButtonText(@NotNull ChoiceSetting setting) {
         MutableComponent currentChoice = hasChoice(setting)
                 ? choiceValue(setting)
                 : Component.translatable("menu.trc-core.none");
 
-        return Component.literal(setting.name + ": ").append(currentChoice.withStyle(ChatFormatting.YELLOW));
+        return label(setting).append(": ").append(currentChoice.withStyle(ChatFormatting.YELLOW));
+    }
+
+    private @NotNull Component keyText(@NotNull KeySetting setting) {
+        return label(setting).append(": ")
+                .append(keyDisplay(setting).copy().withStyle(
+                        setting.isUnbound() ? ChatFormatting.GRAY : ChatFormatting.YELLOW));
     }
 
     private static class SettingBox extends EditBox {
@@ -914,7 +908,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         }
 
         @Override
-        public void insertText(final String input) {
+        public void insertText(final @NonNull String input) {
             if (!this.numeric) {
                 super.insertText(input);
                 return;
@@ -1020,7 +1014,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
                     ? Component.translatable("menu.trc-core.value.nobody")
                     : Component.literal(String.valueOf(setting.value));
 
-            this.setMessage(Component.literal(setting.name + ": ").append(value.withStyle(ChatFormatting.YELLOW)));
+            this.setMessage(label(setting).append(": ").append(value.withStyle(ChatFormatting.YELLOW)));
         }
 
         @Override
@@ -1039,7 +1033,7 @@ public class TRCGlobalSettingsScreen extends Screen implements ClientSettingsCac
         }
 
         @Override
-        public void onClick(final MouseButtonEvent event, final boolean doubleClick) {
+        public void onClick(final @NonNull MouseButtonEvent event, final boolean doubleClick) {
             this.held = true;
             this.moved = false;
             super.onClick(event, doubleClick);

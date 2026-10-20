@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
+import org.jspecify.annotations.NonNull;
 import trc.core.TRCCore;
 
 public record SettingsEditPayload(String modId, String settingId, String value, boolean preview) implements CustomPacketPayload {
@@ -27,5 +28,5 @@ public record SettingsEditPayload(String modId, String settingId, String value, 
             INVALID);
 
     @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    public CustomPacketPayload.@NonNull Type<? extends CustomPacketPayload> type() { return TYPE; }
 }

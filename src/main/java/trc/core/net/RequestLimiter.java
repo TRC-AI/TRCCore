@@ -44,7 +44,7 @@ public final class RequestLimiter {
 
     public static void submit(@NotNull MinecraftServer server, @NotNull ServerPlayer player,
                               @NotNull String key, @NotNull Runnable request) {
-        State state = players.computeIfAbsent(player.getUUID(), id -> new State());
+        State state = players.computeIfAbsent(player.getUUID(), _ -> new State());
         state.host = server.isSingleplayerOwner(player.nameAndId());
 
         int tick = server.getTickCount();
@@ -78,7 +78,7 @@ public final class RequestLimiter {
     public static boolean tryAcquire(@NotNull MinecraftServer server, @Nullable ServerPlayer player) {
         if (player == null || server.isSingleplayerOwner(player.nameAndId())) return true;
 
-        State state = players.computeIfAbsent(player.getUUID(), id -> new State());
+        State state = players.computeIfAbsent(player.getUUID(), _ -> new State());
         int tick = server.getTickCount();
 
         if (state.lastTick == tick || !state.queued.isEmpty()) return false;

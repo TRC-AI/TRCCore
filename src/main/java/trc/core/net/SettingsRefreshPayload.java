@@ -6,6 +6,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
+import org.jspecify.annotations.NonNull;
 import trc.core.TRCCore;
 
 public record SettingsRefreshPayload() implements CustomPacketPayload {
@@ -18,5 +19,5 @@ public record SettingsRefreshPayload() implements CustomPacketPayload {
             TolerantCodec.of("settings_refresh", StreamCodec.unit(INSTANCE), INSTANCE);
 
     @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    public CustomPacketPayload.@NonNull Type<? extends CustomPacketPayload> type() { return TYPE; }
 }

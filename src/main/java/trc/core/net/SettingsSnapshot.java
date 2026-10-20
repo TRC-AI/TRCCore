@@ -39,7 +39,7 @@ public final class SettingsSnapshot {
 
             for (Setting setting : settings) {
                 if (setting instanceof StringSetting text && text.sensitive) {
-                    StringSetting masked = new StringSetting(text.id, text.name, text.defaultValue, text.maxLength).sensitive();
+                    StringSetting masked = new StringSetting(text.id, text.translationComponent, text.defaultValue, text.maxLength, text.name).sensitive();
                     masked.value = "";
                     shown.add(masked);
 
@@ -106,7 +106,7 @@ public final class SettingsSnapshot {
                         Setting setting = SettingsManager.gson().fromJson(entry, Setting.class);
 
                         if (setting != null) settings.add(setting);
-                    } catch (RuntimeException e) {
+                    } catch (RuntimeException _) {
                     }
                 }
             }

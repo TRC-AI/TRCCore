@@ -26,6 +26,7 @@ import trc.core.settings.SettingsAudit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
@@ -53,7 +54,7 @@ public final class TRCServerCommand {
     };
 
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> build(dispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> build(dispatcher));
     }
 
     private static void build(@NotNull CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -89,11 +90,9 @@ public final class TRCServerCommand {
     private static boolean mayReach(@NotNull CommandSourceStack source, String modId) {
         ServerPlayer player = source.getPlayer();
 
-        if (player == null) return true;
+        if (player == null) return false;
 
-        return TRCCore.MOD_ID.equals(modId)
-                ? TRCCoreNetworking.maySetPermissionSetting(source.getServer(), player)
-                : TRCCoreNetworking.mayEdit(source.getServer(), player);
+        return TRCCore.MOD_ID.equals(modId) ? !TRCCoreNetworking.maySetPermissionSetting(source.getServer(), player) : !TRCCoreNetworking.mayEdit(source.getServer(), player);
     }
 
     private static void refreshIfPermissionSetting(@NotNull CommandSourceStack source, String modId) {
@@ -113,7 +112,7 @@ public final class TRCServerCommand {
         MinecraftServer server = source.getServer();
 
         for (Map.Entry<String, ISettingsHolder> entry : TRCCoreNetworking.serverHolders().entrySet()) {
-            if (!mayReach(source, entry.getKey())) continue;
+            if (mayReach(source, entry.getKey())) continue;
 
             if (SettingsCommand.hasAnyId(TRCCoreNetworking.visibleSettings(server, entry.getValue()))) {
                 mods.add(entry.getKey());
@@ -124,7 +123,7 @@ public final class TRCServerCommand {
     }
 
     private static @Nullable List<Setting> settingsOf(@NotNull CommandSourceStack source, String modId) {
-        if (!mayReach(source, modId)) return null;
+        if (mayReach(source, modId)) return null;
 
         ISettingsHolder holder = holderOf(modId);
 
@@ -157,7 +156,7 @@ public final class TRCServerCommand {
         source.sendSuccess(() -> SettingsCommand.listHeading(chat("trc-core.command.list.server", "Server mods:")), false);
 
         for (String modId : mods) {
-            int count = TRCCoreNetworking.visibleSettings(source.getServer(), holderOf(modId)).size();
+            int count = TRCCoreNetworking.visibleSettings(source.getServer(), Objects.requireNonNull(holderOf(modId))).size();
 
             source.sendSuccess(() -> SettingsCommand.listEntry(modId, SettingsCommand.displayNameOf(modId), count), false);
         }
@@ -174,7 +173,7 @@ public final class TRCServerCommand {
 
         refreshIfPermissionSetting(source, modId);
 
-        if (!mayReach(source, modId)) {
+        if (mayReach(source, modId)) {
             source.sendFailure(denied(modId));
             return 0;
         }
@@ -207,7 +206,7 @@ public final class TRCServerCommand {
 
         refreshIfPermissionSetting(source, modId);
 
-        if (!mayReach(source, modId)) {
+        if (mayReach(source, modId)) {
             source.sendFailure(denied(modId));
             return 0;
         }
@@ -259,7 +258,7 @@ public final class TRCServerCommand {
 
         refreshIfPermissionSetting(source, modId);
 
-        if (!mayReach(source, modId)) {
+        if (mayReach(source, modId)) {
             source.sendFailure(denied(modId));
             return 0;
         }

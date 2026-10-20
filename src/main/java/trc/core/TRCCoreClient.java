@@ -32,9 +32,9 @@ public class TRCCoreClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        ClientPlayNetworking.registerGlobalReceiver(SettingsSyncPayload.TYPE, (payload, context) -> { if (payload != SettingsSyncPayload.INVALID) ClientSettingsCache.accept(payload); });
+        ClientPlayNetworking.registerGlobalReceiver(SettingsSyncPayload.TYPE, (payload, _) -> { if (payload != SettingsSyncPayload.INVALID) ClientSettingsCache.accept(payload); });
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, _) -> {
             if (!(message.getContents() instanceof TranslatableContents translatable)) return true;
 
             String key = translatable.getKey();
@@ -47,7 +47,7 @@ public class TRCCoreClient implements ClientModInitializer {
 
         SettingsManager.getSettingsManager().register(TRCCoreClientSettings.INSTANCE);
 
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientSettingsCache.clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> ClientSettingsCache.clear());
 
         TRCClientCommand.register();
 
@@ -70,7 +70,7 @@ public class TRCCoreClient implements ClientModInitializer {
             SettingsManager.getSettingsManager().tick(SettingsManager.Side.CLIENT);
         });
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> SettingsManager.getSettingsManager().flush(SettingsManager.Side.CLIENT));
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> SettingsManager.getSettingsManager().flush(SettingsManager.Side.CLIENT));
 
         AddonLoader.run("trc_addon_client", TRCLog.CLIENT, SettingsManager.Side.CLIENT);
     }

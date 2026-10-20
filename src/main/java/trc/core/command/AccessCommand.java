@@ -122,7 +122,7 @@ public final class AccessCommand {
     }
 
     private static @NotNull SuggestionProvider<CommandSourceStack> entriesOf(@NotNull ListSpec spec) {
-        return (context, builder) -> {
+        return (_, builder) -> {
             List<String> names = new ArrayList<>();
 
             for (SettingsAccessList.Entry entry : SettingsAccessList.entries(spec.kind())) {

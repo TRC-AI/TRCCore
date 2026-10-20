@@ -66,10 +66,10 @@ public final class TRCCoreNetworking {
         });
 
         ServerPlayNetworking.registerGlobalReceiver(SettingsRefreshPayload.TYPE,
-                (payload, context) -> RequestLimiter.submit(context.server(), context.player(),
+                (_, context) -> RequestLimiter.submit(context.server(), context.player(),
                         "refresh", () -> refresh(context.server(), context.player())));
 
-        ServerPlayConnectionEvents.JOIN.register((listener, sender, server) -> {
+        ServerPlayConnectionEvents.JOIN.register((listener, _, server) -> {
             SettingsAccessList.reconcile(listener.getPlayer().nameAndId());
 
             sendTo(server, listener.getPlayer());
@@ -77,7 +77,7 @@ public final class TRCCoreNetworking {
             refreshRights(server);
         });
 
-        ServerPlayConnectionEvents.DISCONNECT.register((listener, server) -> {
+        ServerPlayConnectionEvents.DISCONNECT.register((listener, _) -> {
             lastRights.remove(listener.getPlayer().getUUID());
             RequestLimiter.forget(listener.getPlayer().getUUID());
         });

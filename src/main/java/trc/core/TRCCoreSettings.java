@@ -16,10 +16,10 @@ public class TRCCoreSettings implements ISettingsHolder {
     public static final TRCCoreSettings INSTANCE = new TRCCoreSettings();
 
     public static final IntSetting REQUIRED_OP_LEVEL =
-            new IntSetting("required_op_level", "Required OP level to edit server settings", 5, 0, 5, 1000, false);
+            new IntSetting("required_op_level", Component.translatable("trc-core.setting.required_op_level"), 5, 0, 5, 1000, false);
 
     public static final BoolSetting ALLOW_LAN_EDITS =
-            new BoolSetting("allow_lan_edits", "LAN players may edit settings", false);
+            new BoolSetting("allow_lan_edits", Component.translatable("trc-core.setting.allow_lan_edits"), false);
 
     private static final List<Setting> SETTINGS = List.of(REQUIRED_OP_LEVEL, ALLOW_LAN_EDITS);
 

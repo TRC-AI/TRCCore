@@ -13,7 +13,7 @@ public class TRCCoreClientSettings implements ISettingsHolder {
 
     public static final String MOD_ID = TRCCore.MOD_ID + "_client";
 
-    public static final ChoiceSetting CHAT_NOTICES = new ChoiceSetting("chat_notices", "Settings changes in chat", List.of("all", "none", "command only", "ui only"), 2);
+    public static final ChoiceSetting CHAT_NOTICES = new ChoiceSetting("chat_notices", null, List.of("all", "none", "command only", "ui only"), 2, "Settings changes in chat");
 
     private static final List<Setting> SETTINGS = List.of(CHAT_NOTICES);
 

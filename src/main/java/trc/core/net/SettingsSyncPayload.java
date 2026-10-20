@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
+import org.jspecify.annotations.NonNull;
 import trc.core.TRCCore;
 
 public record SettingsSyncPayload(boolean allowed, boolean mayManage, String json) implements CustomPacketPayload {
@@ -26,5 +27,5 @@ public record SettingsSyncPayload(boolean allowed, boolean mayManage, String jso
             INVALID);
 
     @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return TYPE; }
+    public CustomPacketPayload.@NonNull Type<? extends CustomPacketPayload> type() { return TYPE; }
 }

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 import net.minecraft.network.codec.StreamCodec;
 
+import org.jspecify.annotations.NonNull;
 import trc.core.TRCLog;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +18,7 @@ final class TolerantCodec {
 
         return new StreamCodec<>() {
             @Override
-            public T decode(ByteBuf input) {
+            public @NonNull T decode(@NonNull ByteBuf input) {
                 T value;
 
                 try {
@@ -41,7 +42,7 @@ final class TolerantCodec {
             }
 
             @Override
-            public void encode(ByteBuf output, T value) {
+            public void encode(@NonNull ByteBuf output, @NonNull T value) {
                 inner.encode(output, value);
             }
         };
