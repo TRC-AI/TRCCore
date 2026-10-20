@@ -2,6 +2,7 @@ package trc.core.settings;
 
 import net.fabricmc.loader.api.FabricLoader;
 
+import net.minecraft.network.chat.Component;
 import trc.core.TRCLog;
 
 import com.google.gson.*;
@@ -22,10 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 
 public class SettingsManager {
-    private static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(Setting.class, new SettingAdapter())
-            .setPrettyPrinting()
-            .create();
 
     private static final int FLUSH_INTERVAL = 20;
     private final Map<String, ISettingsHolder> registeredMods = new HashMap<>();
@@ -51,7 +48,19 @@ public class SettingsManager {
         }
     }
 
-    public static Gson gson() { return GSON; }
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(Setting.class, new SettingAdapter())
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+                    return Component.class.isAssignableFrom(f.getDeclaredClass());
+                }
+
+                @Override
+                public boolean shouldSkipClass(Class<?> clazz) { return false; }
+            })
+            .setPrettyPrinting()
+            .create();
 
     private static final String CLIENT_SUFFIX = "_client";
 
