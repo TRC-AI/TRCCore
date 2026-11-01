@@ -23,10 +23,6 @@ public class TitleButtonScreen extends TRCGlobalSettingsScreen {
      */
     @Override
     public void onClose() {
-        if (this.minecraft == null) {
-            return;
-        }
-
         this.minecraft.setScreen(this.nativeScreen != null ? this.nativeScreen : this.parent);
     }
 }
