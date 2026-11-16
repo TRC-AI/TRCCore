@@ -33,7 +33,7 @@ public abstract class TitleScreenMixin extends Screen {
 
         SpriteIconButton button = SpriteIconButton.builder(
                         Component.translatable("menu.trc-core.settings"),
-                        _ -> this.minecraft.setScreen(new TitleButtonScreen(this, this)),
+                        _ -> this.minecraft.setScreenAndShow(new TitleButtonScreen(this, this)),
                         true
                 )
                 .size(20, 20)

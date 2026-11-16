@@ -65,7 +65,7 @@ public class TRCCoreClient implements ClientModInitializer {
         );
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (settingsKey.consumeClick()) client.setScreen(new TRCGlobalSettingsScreen(Component.empty()));
+            while (settingsKey.consumeClick()) client.setScreenAndShow(new TRCGlobalSettingsScreen(Component.empty()));
 
             SettingsManager.getSettingsManager().tick(SettingsManager.Side.CLIENT);
         });
