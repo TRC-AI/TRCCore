@@ -3,7 +3,7 @@
   "package": "trc.core.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ServerGamePacketListenerImplMixin"
+    "ServerCommandSuggestionsProviderMixin"
   ],
   "client": [
     "ClientPacketListenerMixin",
