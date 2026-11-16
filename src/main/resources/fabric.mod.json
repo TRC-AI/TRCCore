@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "trc-core",
+  "version": "${version}",
+  "name": "TRC Core & Libs",
+  "description": "The central library, GUI, settings, and framework for TRC-AI mods.",
+  "authors": [
+    "TRC-AI"
+  ],
+	"contact": {
+		"github": "https://github.com/TRC-AI/"
+	},
+	"license": "MIT",
+	"icon": "assets/trc-core/icon.png",
+	"environment": "*",
+	"entrypoints": {
+        "main": [
+          "trc.core.TRCCore"
+        ]
+	},
+	"mixins": [
+      "trc-core.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": ["26.1", "26.1.1", "26.1.2"],
+		"java": ">=25",
+		"fabric-api": ">=0.144.0"
+	}
+}
