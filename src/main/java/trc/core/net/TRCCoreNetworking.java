@@ -187,7 +187,7 @@ public final class TRCCoreNetworking {
 
             SettingsSnapshot.Section section = SettingsSnapshot.Section.forClient(entry.getKey(), name, settings);
 
-            if (entry.getValue() == TRCCoreSettings.INSTANCE) if (maySetPermissionSetting(server, player)) core = section;
+            if (entry.getValue() == TRCCoreSettings.INSTANCE) { if (maySetPermissionSetting(server, player)) core = section; }
             else sections.add(section);
         }
 
