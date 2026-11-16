@@ -22,8 +22,6 @@ import trc.core.net.SettingsSyncPayload;
 import trc.core.settings.SettingsManager;
 import trc.core.settings.TRCGlobalSettingsScreen;
 
-import org.lwjgl.glfw.GLFW;
-
 import static trc.core.TRCCore.MOD_ID;
 
 public class TRCCoreClient implements ClientModInitializer {
@@ -58,8 +56,8 @@ public class TRCCoreClient implements ClientModInitializer {
         settingsKey = KeyMappingHelper.registerKeyMapping(
                 new KeyMapping(
                         "key.trc-core.settings",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_U,
+                        InputConstants.Type.KEYBOARD,
+                        InputConstants.KEY_U,
                         CATEGORY
                 )
         );
