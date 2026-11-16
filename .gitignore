@@ -8,4 +8,5 @@
 !/LICENSE
 !/README.md
 !/settings.gradle
+!/.gitattributes
 .DS_Store

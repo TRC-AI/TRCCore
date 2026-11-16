@@ -1,1 +1,27 @@
-{}
+{
+  "menu.trc-core.settings": "TRC Settings",
+  "menu.trc-core.no_server_core": " — server without TRC-Core",
+  "menu.trc-core.search": "Search",
+  "menu.trc-core.reset": "Reset to default",
+  "menu.trc-core.unbound": "Unbound",
+  "menu.trc-core.section_client": "%s (Client)",
+  "menu.trc-core.on": "ON",
+  "menu.trc-core.off": "OFF",
+  "menu.trc-core.none": "None",
+  "menu.trc-core.key_waiting": "> ... <",
+  "menu.trc-core.hidden_hint": "Hidden -- type to replace",
+  "menu.trc-core.filter.both": "Showing server and client settings",
+  "menu.trc-core.filter.server": "Showing server settings only",
+  "menu.trc-core.filter.client": "Showing client settings only",
+  "menu.trc-core.value.nobody": "nobody",
+  "menu.trc-core.chat_notices.all": "all",
+  "menu.trc-core.chat_notices.none": "none",
+  "menu.trc-core.chat_notices.command_only": "command only",
+  "menu.trc-core.chat_notices.ui_only": "ui only",
+  "trc-core.section.name": "TRC Core & Libs",
+  "trc-core.setting.required_op_level": "Required OP level to edit server settings",
+  "trc-core.setting.allow_lan_edits": "LAN players may edit settings",
+  "trc-core.setting.chat_notices": "Settings changes in chat",
+  "key.trc-core.settings": "TRC-Settings menu",
+  "key.category.trc-core.trc-core": "TRC-Mods"
+}
